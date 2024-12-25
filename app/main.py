@@ -14,9 +14,9 @@ def create_app():
     api = Api(app)
     jwt = JWTManager(app)
     
-    # Setup MongoDB
+    # Setup MongoDB with explicit database selection
     client = MongoClient(app.config["MONGODB_URI"])
-    app.mongo = client[app.config["MONGODB_DB"]]
+    app.mongo = client.get_database(app.config["MONGODB_DB"])
     
     # Create indexes
     app.mongo.users.create_index("email", unique=True)

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from bson import ObjectId
 from app.core.security import hash_password
 
@@ -8,7 +8,7 @@ class User:
         self.name = name
         self.email = email
         self.password = hash_password(password)
-        self.created_at = created_at if created_at else datetime.utcnow()
+        self.created_at = created_at if created_at else datetime.now(timezone.utc)
 
     @staticmethod
     def from_db(data):
@@ -30,3 +30,7 @@ class User:
             "password": self.password,
             "created_at": self.created_at
         }
+
+    @property
+    def id(self):
+        return self._id

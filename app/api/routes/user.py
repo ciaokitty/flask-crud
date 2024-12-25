@@ -17,7 +17,7 @@ class UserList(MethodView):
     @jwt_required()
     def get(self):
         """Get all users"""
-        users = current_app.mongo.db.users.find()
+        users = current_app.mongo.users.find()
         return [User.from_db(user) for user in users]
 
     @blp.arguments(UserSchema)
@@ -26,7 +26,7 @@ class UserList(MethodView):
         """Create a new user"""
         try:
             user = User(**user_data)
-            current_app.mongo.db.users.insert_one(user.to_dict())
+            current_app.mongo.users.insert_one(user.to_dict())
             return user
         except DuplicateKeyError:
             abort(400, message="A user with this email already exists.")
@@ -37,7 +37,7 @@ class UserResource(MethodView):
     @jwt_required()
     def get(self, user_id):
         """Get a user by ID"""
-        user = current_app.mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user = current_app.mongo.users.find_one({"_id": ObjectId(user_id)})
         if not user:
             abort(404, message="User not found.")
         return User.from_db(user)
@@ -50,14 +50,14 @@ class UserResource(MethodView):
         if get_jwt_identity() != user_id:
             abort(403, message="Not authorized to update this user.")
             
-        result = current_app.mongo.db.users.update_one(
+        result = current_app.mongo.users.update_one(
             {"_id": ObjectId(user_id)},
             {"$set": user_data}
         )
         if result.modified_count == 0:
             abort(404, message="User not found.")
             
-        user = current_app.mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user = current_app.mongo.users.find_one({"_id": ObjectId(user_id)})
         return User.from_db(user)
 
     @jwt_required()
@@ -66,7 +66,7 @@ class UserResource(MethodView):
         if get_jwt_identity() != user_id:
             abort(403, message="Not authorized to delete this user.")
             
-        result = current_app.mongo.db.users.delete_one({"_id": ObjectId(user_id)})
+        result = current_app.mongo.users.delete_one({"_id": ObjectId(user_id)})
         if result.deleted_count == 0:
             abort(404, message="User not found.")
         return "", 204
@@ -76,7 +76,7 @@ class UserLogin(MethodView):
     @blp.arguments(UserLoginSchema)
     def post(self, login_data):
         """Login a user"""
-        user = current_app.mongo.db.users.find_one({"email": login_data["email"]})
+        user = current_app.mongo.users.find_one({"email": login_data["email"]})
         if not user or not verify_password(login_data["password"], user["password"]):
             abort(401, message="Invalid credentials.")
         
