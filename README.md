@@ -9,7 +9,6 @@ Before you begin, ensure you have the following installed:
 - Git
 - Docker 
 
-## Option 1: Standard Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -45,7 +44,7 @@ poetry run flask run
 
 The API will be available at `http://localhost:5000`
 
-## Option 2: Docker Setup
+## Docker Setup
 
 ### 1. Clone the Repository
 ```bash
